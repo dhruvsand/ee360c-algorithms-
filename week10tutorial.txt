@@ -1,0 +1,245 @@
+Greedy algorithms
+
+
+Minimizing total weighted completion time
+    You want to schedule jobs from n customers.
+        Each customer has 1 job.
+        Customer i has job i.
+        Job i takes ti time, completed at time ci.
+            I.e., ci = sum of the times of previously-completed jobs
+        Customer/job i has weight wi.
+        
+        One job at a time.
+        Don't interrupt jobs or switch jobs before completion.
+
+    Minimize weighted sum of completion times.
+        sum_i=1..n wi*ci
+
+        wi can represent some notion of customer/job importance.
+        Or, wi can be the hourly cost for renting equipment and hiring people,
+        assuming you rent/hire from the very beginning so that you are
+        guaranteed to have what you need when you need it.
+
+    What are some potential greedy algorithms?
+    Can you find counter-examples for each?
+        Order in decreasing weight
+            Counter-example: w1=5 t1=1000
+                             w2=4 t2=10
+                             w3=4 t3=10
+                Greedy total: 5*1000 + 4*1010 + 4*1020
+                Optimal:      4*10 + 4*20 + 5*1020
+        Order in decreasing time
+            Counter-example: w1=5 t1=1000
+                             w2=4 t2=10
+                             w3=4 t3=10
+                Greedy total: 5*1000 + 4*1010 + 4*1020
+                Optimal:      4*10 + 4*20 + 5*1020
+        Order in increasing time
+            Counter-example: w1=100 t1=100
+                             w2=3 t2=10
+                             w3=2 t3=20
+                Greedy total: 3*10 + 2*30 + 100*130   = 13090
+                Optimal:      100*100 + 3*110 + 2*120 = 10570
+        Order in decreasing wi/ti, i.e., weight per unit of time
+            No counter-example, because it's optimal.
+        Other ideas???
+
+    Solution:
+        Order in decreasing wi/ti, i.e., weight per unit of time
+
+        I.e., you want to get rid of the expensive hourly rentals/hires as
+        soon as possible.
+
+    Example
+
+    Proof by exchange argument
+        Consider that we have a greedy schedule A and an optimal schedule OPT.
+
+        Since OPT is optimal, then swapping the order of any pair of jobs
+        would result in schedule of less-or-equal weighted sum.   (1)
+
+        Equivalently, let's change our perspective...
+
+        If A is not optimal, then it must contain at least one ADJACENT pair
+        of jobs i,j that are out of order relative to OPT.
+
+            Why must there be an ADJACENT pair?
+                Think of renumbering the jobs such that OPT = 1,2,3,4,...
+                Then in A, some larger numbered job must come before
+                a smaller numbered job.
+                (Note that we're not depending on such a renumbering in the
+                 larger proof.)
+
+            A schedules j before i, so wj/tj >= wi/ti.     (2)
+
+            Schedule A' is identical, except that i before j.
+            By (1), A' has lower total cost than A.
+
+            Let c be the completion time of jobs prior to j.
+
+            In schedule A, the contribution of i,j to total cost is
+                wi(c + ti) + wj(c + ti + tj)               (3)
+            In schedule A', the contribution of i,j to total cost is
+                wj(c + tj) + wi(c + ti + tj)               (4)
+
+            Cost of A' - cost of A
+                = wj(c + tj) + wi(c + ti + tj) - wi(c + ti) + wj(c + ti + tj)
+                                                           By (3),(4)
+                = wi tj - wj ti                            Algebra
+                <= 0                                       By (2)
+
+            So, schedule A' is not better than schedule A.
+            So, schedule A cannot be non-optimal.
+
+
+Generic Greedy Algorithm on Minimum Spanning Trees (MSTs)
+
+    Very brief background, largely recap from COMP 182 & COMP 382 class.
+        Several well-known and lesser-known greedy algorithms for MSTs.
+        (Aside:  They have also been subject to repeated rediscovery.)
+
+        Boruvka (1926), Choquet (1938), Florek et al (1951), Sollin (1965)
+            Maintain a forest of trees.
+            Repeat:
+                For all trees simultaneously, find lowest cost
+                edge from this tree to another.  Add these edges.
+
+        Jarnik (1930), Prim (1957), Dijkstra (1959)
+            Maintain one tree.
+            Repeat:
+               Find lowest cost edge fro this tree to another node.
+               Add this edge.
+
+        Kruskal (1956)
+            Maintain a forest of trees.
+            Repeat:
+                Find lowest cost edge between trees.
+                Add this edge.
+
+        Reverse-delete (1956 - Also by Kruskal in same paper as above!)
+            Start with entire graph.
+            Repeat:
+                Find highest cost edge that is part of a cycle.
+                Remove this edge.
+
+    All are fairly similar.  Can generalize all of them and give a general
+    correctness proof.
+        In short, we can either add inexpensive non-cycle-inducing edges
+        to the MST or we can remove expensive cycle-inducing edges
+        from consideration.
+
+        As before, proof is in terms of cuts and crossings.
+
+        However, we'll ignore time complexity, as the data structures vary.
+
+    Terminology reminder:  (ask students to define)
+        Cut:
+            Partition of the vertices into two non-empty sets.
+        Crossing:
+            Edge crosses the cut if it has one end in each part.
+
+    Generic algorithm:
+        Edges start uncolored.  We color them blue (accepted into MST) or
+        red (rejected) by the following two coloring rules.  These rules
+        can be applied in any order.
+        
+        Blue rule:
+            Given a cut that no blue edges cross, select a minimum
+            uncolored edge crossing the cut, and color it blue.
+
+        Red rule:
+            Given a cycle containing no red edges, select a maximum
+            uncolored edge on the cycle, and color it red.
+
+    Relationship to previous algorithms:
+        Boruvka, Prim, Kruskal all use just Blue rule, finding cut in
+        various ways.
+
+        Reverse-delete just uses just Red rule, finding cut in a particular
+        way.
+
+    Example:
+        Do examples combining rules in various ways.
+        (E.g., all blue, all red, or mixed.)
+        (Can make this very interactive by having students in turn suggest
+         the next rule, or by choosing rules randomly, etc.)
+
+    Algorithm termination:
+        Claim: If any edges are uncolored, one of the rules applies.
+
+        Proof:
+            Suppose edge (v,w) uncolored.
+            Let X  = Set of vertices reachable from v via blue edges.
+            Let X' = All the other vertices.
+
+            If w in X,
+                (v,w) is on a cycle whose other edges are blue.
+                Red rule applies to (v,w).
+            Else
+                X,X' is a cut crossed by (v,w) but no blue edges.
+                Blue rule applies to (v,w) or some other edge.
+
+        Thus, algorithm eventually colors all edges, regardless of rule order.
+
+    Algorithm correctness:
+        Maintains invariant:
+            Some MST contains all of the blue edges and no red edges.
+
+        Induction on number of edges colored so far.
+        Base case:
+            No edges colored.  Any MST satisfied invariant.
+        Inductive case:
+            Assume invariant holds with MST T.
+            By previously claim, we can apply a rule.
+            Need to show invariant holds for some MST after applying a rule.
+
+            If Blue rule colors minimum edge (v,w) crossing cut X,X':
+                If (v,w) in T:
+                    T satisfies invariant after (v,w) colored.
+                Else:
+                    Adding (v,w) to T would form cycle.
+                    This cycle contains at least one edge (x,y) in T
+                        crossing X,X'.
+                    (x,y) must be uncolored since it crosses the cut.
+                    Cost of (x,y) >= cost of (v,w),                   (1)
+                        since (v,w) is minimum crossing.
+                    Let T' = T - (x,y) + (v,w)                        (2)
+                    T' is a spanning tree,                            (3)
+                        since T is MST, and both edges cross this cut
+                    Cost of T' <= cost of T, by (1)&(2)               (4)
+                    T' is MST,
+                        since T is MST, (3)&(4)
+                    T' satisfies invariant after (v,w) colored.
+
+            If Red rule colors maximum edge (v,w) on cycle C:
+                If (v,w) in T:
+                    T satisfies invariant after (v,w) colored.
+                Else:
+                    T - (v,w) results in two trees.
+                    At least one edge (x,y) in C-(v,w) must have an end
+                        in each tree.
+                    (x,y) is uncolored.
+                        Not blue since (x,y) not in T.
+                        Not red since C contains no red edges.
+                    Cost of (v,w) >= cost of (x,y),                  (5)
+                        since (v,w) is maximum uncolored edge on C.
+                    Let T' = T - (v,w) + (x,y)                       (6)
+                    T' is MST,                                       (7)
+                        since T is MST, (5)&(6)
+                    Cost of (v,w) = cost of (x,y),
+                        since (5)&(6)&(7)
+                    T' satisfies invariant after (v,w) colored.
+
+        Thus, invariant implies that at termination, the blue edges form MST.
+
+    Furthermore, this correctness proof also implies that if all edge costs
+    are distinct, the MST is unique.
+
+        Assume you have two MSTs T, T'.
+        Cost of T' = cost of T,                                      (8)
+            since both T,T' are MSTs
+        Two MSTs only occur in Blue Else and Red Else cases, so look there.
+        Cost of (v,w) = cost of (x,y),
+            since (8)&(2 or 6, depending on case)
+        (v,w) = (x,y),
+            since edge costs distinct

@@ -1,0 +1,26 @@
+Found and extracted files:
+/home/cassidy/Documents/Algo/360C_LAB1_WORKING_DIR__/Program1.java
+
+Copying given files to /home/cassidy/Documents/Algo/360C_LAB1_WORKING_DIR__
+/home/cassidy/Documents/Algo/test_code/Matching.java
+/home/cassidy/Documents/Algo/test_code/Lab1Tester.java
+/home/cassidy/Documents/Algo/test_code/AbstractProgram1.java
+/home/cassidy/Documents/Algo/test_code/Permutation.java
+Done
+
+Compiling java files...
+Done
+
+Running '-b small_inputs/4.in'
+--------------------------------
+(<YOU SHOULD SEE YOUR PROGRAM OUTPUT HERE>)
+
+--------------------------------
+Done
+
+Running '-g large_inputs/160.in'
+--------------------------------
+(<YOU SHOULD SEE YOUR PROGRAM OUTPUT HERE>)
+
+--------------------------------
+Done
